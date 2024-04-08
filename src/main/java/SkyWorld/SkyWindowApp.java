@@ -50,6 +50,7 @@ public class SkyWindowApp
         menu.add(menu3);
         bar.add(menu);
         mainFrame.setJMenuBar(bar);
+//        new Thread(() ->AudioPlayer.play("/test.mp3")).start();
         theMap.mapEnum = MapEnum.home;
         theMap.mapID = 0;
         ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/BackGround.png"));
@@ -245,7 +246,7 @@ public class SkyWindowApp
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            System.err.println("读取文件失败");
         }
         return "";
     }
