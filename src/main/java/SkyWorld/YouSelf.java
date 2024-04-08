@@ -13,16 +13,14 @@ public class YouSelf extends SkyPlayer
     private final String password;
     public boolean black;
 
-    public YouSelf(int permanent_light_wing, int wings_of_light, int id, String name,String password)
-    {
+    public YouSelf(int permanent_light_wing, int wings_of_light, int id, String name,String password){
         super(permanent_light_wing, wings_of_light, id, name);
         this.password=password;
         lastMap= MapEnum.home;
         lastMapID=0;
     }
 
-    public YouSelf(String name,String password)
-    {
+    public YouSelf(String name,String password){
         permanent_light_wing=0;
         wings_of_light=0;
         id=1;
@@ -52,8 +50,10 @@ public class YouSelf extends SkyPlayer
         this.lastMapID = lastMapID;
     }
 
-    public void choose()
-    {
+    /**
+     * 玩家选择
+     */
+    public void choose(){
         Scanner sc = new Scanner(System.in);
 
         System.out.println("\n你现在在" + nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID) + "！你可以：");
@@ -155,8 +155,10 @@ public class YouSelf extends SkyPlayer
         }
     }
 
-    public void xianJi()
-    {
+    /**
+     * 开始献祭
+     */
+    public void xianJi(){
         Sacrifice sa =new Sacrifice();
         YouEnergy ye =new YouEnergy(sa,this);
         Thread th1 =new Thread(sa,"Sacrifice");
@@ -248,8 +250,10 @@ public class YouSelf extends SkyPlayer
         save();
     }
 
-    public void congSeng()
-    {
+    /**
+     * 重生
+     */
+    public void congSeng(){
         wings_of_light++;
         getMaxEnergy();
         start();
@@ -261,15 +265,20 @@ public class YouSelf extends SkyPlayer
         save();
     }
 
-    public void showInfo()
-    {
+    /**
+     * 显示信息
+     */
+    public void showInfo(){
         System.out.println("您当前账号的信息为：账号名称："+name);
         System.out.println("光翼数量："+wings_of_light+"，能量上限："+maxEnergy+"，当前能量："+nowEnergy);
         System.out.println("蜡烛数量："+candle+"爱心数量："+heart+"红蜡烛数量："+redCandle);
     }
 
-    public String getInfo()
-    {
+    /**
+     * 获取信息
+     * @return 玩家信息
+     */
+    public String getInfo(){
         StringBuilder sb =new StringBuilder();
         sb.append(name).append(" ").append(permanent_light_wing).append(" ").append(wings_of_light).append(" ")
                 .append(candle).append(" ").append(heart).append(" ").append(redCandle)
@@ -277,8 +286,10 @@ public class YouSelf extends SkyPlayer
         return sb.toString();
     }
 
-    public void save()
-    {
+    /**
+     * 保存玩家信息
+     */
+    public void save(){
         File directory = new File("SkyWorld\\");
         if (!directory.exists()) {
             directory.mkdirs();
@@ -293,8 +304,11 @@ public class YouSelf extends SkyPlayer
         }
     }
 
-    public int lostLightWing()
-    {
+    /**
+     * 掉光翼
+     * @return 掉光翼的数量
+     */
+    public int lostLightWing(){
         if (wings_of_light < 50)
         {
             wings_of_light-=1;

@@ -1,6 +1,5 @@
 package SkyWorld;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.*;
@@ -50,8 +49,11 @@ public class SkyMap
         }
     }
 
-    public void addPlayer(SkyPlayer newPlayer)
-    {
+    /**
+     * 添加玩家
+     * @param newPlayer 新玩家
+     */
+    public void addPlayer(SkyPlayer newPlayer){
         if (players.size() == 8)
         {
             System.out.println("地图内玩家已满 !");
@@ -90,8 +92,11 @@ public class SkyMap
         }
     }*/
 
-    public void lightUpOther(Scanner sc)
-    {
+    /**
+     * 点亮小黑
+     * @param sc 输入
+     */
+    public void lightUpOther(Scanner sc){
         System.out.println("点亮小黑操作：");
         System.out.println("随机点亮一个小黑 ---> 输入1");
         System.out.println("点亮全部小黑 ---> 输入2");
@@ -141,6 +146,10 @@ public class SkyMap
 
     }
 
+    /**
+     * 移动到其他地图
+     * @param sc 输入
+     */
     public void goToOtherMap(Scanner sc)
     {
         System.out.println("请选择你要去的地图：");
@@ -1679,8 +1688,10 @@ public class SkyMap
         }
     }
 
-    public void refreshMap()
-    {
+    /**
+     * 刷新地图
+     */
+    public void refreshMap(){
         if(you.getLastMap() == MapEnum.eden && you.getLastMapID()>=2 && you.getLastMapID()<=4)
             return;
         players.clear();
@@ -1698,8 +1709,10 @@ public class SkyMap
         allPlayer();
     }
 
-    public void allPlayer()
-    {
+    /**
+     * 显示地图及所有玩家信息
+     */
+    public void allPlayer(){
         System.out.println("当前地图为：" + mapInfo.get(mapEnum.ordinal()).get(mapID));
         System.out.print("当前地图内所有玩家为： ");
         for (SkyPlayer player : players)

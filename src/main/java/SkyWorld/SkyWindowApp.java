@@ -50,7 +50,7 @@ public class SkyWindowApp
         menu.add(menu3);
         bar.add(menu);
         mainFrame.setJMenuBar(bar);
-//        new Thread(() ->AudioPlayer.play("/test.mp3")).start();
+        AudioPlayer.startPlay("/test.mp3");
         theMap.mapEnum = MapEnum.home;
         theMap.mapID = 0;
         ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/BackGround.png"));
@@ -68,6 +68,10 @@ public class SkyWindowApp
         mainFrame.setVisible(true);
     }
 
+    /**
+     * 登录
+     * @param oldLabel 旧界面
+     */
     public static void Longin(JLabel oldLabel){
         JFrame f = new JFrame("光遇--登录");
         f.setSize(300, 200);
@@ -169,6 +173,10 @@ public class SkyWindowApp
         f.setVisible(true);
     }
 
+    /**
+     * 进入游戏
+     * @param oldLabel 旧界面
+     */
     public static void ToGame(JLabel oldLabel) {
         oldLabel.removeAll();
 //        ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/home.jpg"));
@@ -222,6 +230,10 @@ public class SkyWindowApp
 //        oldLabel.validate();
     }
 
+    /**
+     * 创建数字按钮
+     * @return 数字按钮数组
+     */
     private static JButton[] createNumberButtons() {
         JButton[] numberButtons = new JButton[10];
         for (int i = 0; i < numberButtons.length; i++) {
@@ -230,6 +242,12 @@ public class SkyWindowApp
         return numberButtons;
     }
 
+    /**
+     * 创建按钮面板
+     * @param numberButtons 数字按钮数组
+     * @param simulatedUserInput 模拟用户输入流
+     * @return 按钮面板
+     */
     private static JPanel createButtonPanel(JButton[] numberButtons, SimulatedUserInputStream simulatedUserInput) {
         JPanel buttonPanel = new JPanel(new GridLayout(2, 5));
         for (JButton button : numberButtons) {
@@ -239,6 +257,11 @@ public class SkyWindowApp
         return buttonPanel;
     }
 
+    /**
+     * 加载文件
+     * @param name 玩家名
+     * @return 玩家信息
+     */
     public static String load(String name){
         try (BufferedReader isr = new BufferedReader(new FileReader("SkyWorld\\" + name + "data.txt")))
         {

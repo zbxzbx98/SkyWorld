@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Objects;
 
 /**
+ * 模拟用户输入
  * @version 1.0
  * @Author zbxzbx98
  * @Date 2024/4/7 下午 1:25

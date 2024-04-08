@@ -13,14 +13,13 @@ public class MD5 {
      * 生成MD5
      */
     public static String encode(String str) {
-        byte[] result = null;
+        byte[] result;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             md.update(str.getBytes(StandardCharsets.UTF_8));
             result = md.digest();
-
         } catch (Exception e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());
             return null;
         }
         return parseByte2HexStr(result);
@@ -28,7 +27,6 @@ public class MD5 {
 
     /**
      * 将二进制转换成十六进制
-     *
      */
     private static String parseByte2HexStr(byte[] buf) {
         StringBuilder sb = new StringBuilder();

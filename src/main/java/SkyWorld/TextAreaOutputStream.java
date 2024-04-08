@@ -6,15 +6,16 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * 输出流到文本框中
  * @version 1.0
- * &#064;Author  zbxzbx98
- * &#064;Date  2024/4/7 上午 11:21
+ * @Author  zbxzbx98
+ * @Date  2024/4/7 上午 11:21
  */
 public class TextAreaOutputStream extends OutputStream {
 
-    private PipedOutputStream out = new PipedOutputStream();
-    private Reader reader;
-    private JTextArea outputArea;
+    private final PipedOutputStream out = new PipedOutputStream();
+    private final Reader reader;
+    private final JTextArea outputArea;
 
     public TextAreaOutputStream(JTextArea outputArea) {
         this.outputArea = outputArea;

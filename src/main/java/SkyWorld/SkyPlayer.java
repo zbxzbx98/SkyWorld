@@ -25,7 +25,7 @@ public class SkyPlayer
         start();
     }
 
-    public SkyPlayer(boolean b){}
+//    public SkyPlayer(boolean b){}
 
     public SkyPlayer(int permanent_light_wing, int wings_of_light, int id, String name)
     {
@@ -37,11 +37,17 @@ public class SkyPlayer
         start();
     }
 
+    /**
+     * 重置能量
+     */
     public void start()
     {
         nowEnergy = maxEnergy;
     }
 
+    /**
+     * 获取最大能量
+     */
     public void getMaxEnergy()
     {
         if (wings_of_light == 0)
@@ -94,6 +100,9 @@ public class SkyPlayer
         }
     }
 
+    /**
+     * 飞行
+     */
     public void fly()
     {
         if (nowEnergy > 0)
