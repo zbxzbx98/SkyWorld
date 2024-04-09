@@ -1,6 +1,5 @@
 package SkyWorld;
 
-public enum MapEnum
-{
+public enum MapEnum {
     home, island, plain, forests, race, wasteland, court, eden
 }

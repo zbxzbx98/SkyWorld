@@ -11,6 +11,7 @@ import org.tritonus.share.sampled.file.TAudioFileReader;
 
 /**
  * 声音播放器，仅限播放MP3
+ *
  * @version 1.0
  * @Author zbxzbx98
  * @Date 2024/4/8 下午 3:03
@@ -19,21 +20,22 @@ public class AudioPlayer {
 
     /**
      * 启动新线程播放音频
+     *
      * @param path 音频资源路径
      */
-    public static void startPlay(String path){
-        new Thread(() ->play(path)).start();
+    public static void startPlay(String path) {
+        new Thread(() -> play(path)).start();
     }
 
     /**
      * 播放音频
+     *
      * @param name 音频资源路径
      */
-    private static void play(String name)
-    {
+    private static void play(String name) {
         URL url = AudioPlayer.class.getResource(name);
         if (url != null) {
-            if(".mp3".equals(name.substring(name.lastIndexOf(".")))){
+            if (".mp3".equals(name.substring(name.lastIndexOf(".")))) {
                 TAudioFileReader reader = new MpegAudioFileReader();
                 try (AudioInputStream audioInputStream = reader.getAudioInputStream(url)) {
                     Player player = new Player(audioInputStream);
@@ -53,7 +55,8 @@ public class AudioPlayer {
 //            }
             else
                 System.err.println("Unsupported audio file format: " + name);
-        }
+        } else
+            System.err.println("Failed to find audio file: " + name);
     }
 
 //    private static void playClip(AudioInputStream audioInputStream) {

@@ -29,13 +29,10 @@ class SimulatedUserInputStream extends InputStream {
             }
         }
 
-        if (!buffer.isEmpty()) {
-            char c = buffer.charAt(0);
-            buffer.deleteCharAt(0); // Remove the first character from the buffer
-            return c; // Return the read character
-        }
+        char c = buffer.charAt(0);
+        buffer.deleteCharAt(0); // Remove the first character from the buffer
+        return c; // Return the read character
 
-        return -1; // End of stream
     }
 
     @Override
@@ -50,6 +47,8 @@ class SimulatedUserInputStream extends InputStream {
             return -1;
         }
         b[off] = (byte)c;
+        if(c=='\n')
+            return 1;
 
         int i = 1;
         try {
@@ -70,7 +69,7 @@ class SimulatedUserInputStream extends InputStream {
     }
 
     @Override
-    public int available() throws IOException {
+    public int available(){
         return buffer.length();
     }
 }

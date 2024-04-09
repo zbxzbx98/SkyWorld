@@ -7,9 +7,10 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * 输出流到文本框中
+ *
  * @version 1.0
- * @Author  zbxzbx98
- * @Date  2024/4/7 上午 11:21
+ * @Author zbxzbx98
+ * @Date 2024/4/7 上午 11:21
  */
 public class TextAreaOutputStream extends OutputStream {
 
@@ -46,10 +47,10 @@ public class TextAreaOutputStream extends OutputStream {
             String text = new String(chars, 0, n);
             // Write the text to the JTextArea
             outputArea.append(text);
-            if(outputArea.getLineCount()>22){
-                outputArea.setText(outputArea.getText().substring(outputArea.getText().indexOf("\n")+1));
+            if (outputArea.getLineCount() > 22) {
+                outputArea.setText(outputArea.getText().substring(outputArea.getText().indexOf("\n") + 1));
             }
-        }else {
+        } else {
             System.err.println("未准备好");
         }
     }
