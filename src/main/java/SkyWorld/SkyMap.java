@@ -41,11 +41,11 @@ public class SkyMap {
         }
         mapIcon = new HashMap<>();
         for (int i = 0; i < MapEnum.values().length; i++) {
-            URL url = SkyApp.class.getResource("/" + MapEnum.values()[i].name() + ".jpg");
+            URL url = SkyApp.class.getResource("/Images/" + MapEnum.values()[i].name() + ".jpg");
             if (url != null)
                 mapIcon.put(MapEnum.values()[i], new ImageIcon(url));
             else
-                mapIcon.put(MapEnum.values()[i], new ImageIcon(SkyApp.class.getResource("/home.jpg")));
+                mapIcon.put(MapEnum.values()[i], new ImageIcon(SkyApp.class.getResource("/Images/home.jpg")));
         }
     }
 

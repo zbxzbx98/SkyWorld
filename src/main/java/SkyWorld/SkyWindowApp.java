@@ -14,7 +14,7 @@ public class SkyWindowApp {
 
     static BackgroundImage backgroundImage;
 
-    static ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/favicon.ico"));
+    static ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/Images/favicon.ico"));
 
     static SkyMap theMap = new SkyMap();
 
@@ -53,7 +53,7 @@ public class SkyWindowApp {
         theMap.mapEnum = MapEnum.home;
         theMap.mapID = 0;
         JLabel jLabel = new JLabel();
-        ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/BackGround.png"));
+        ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/Images/BackGround.png"));
         backgroundImage = new BackgroundImage(imageIcon.getImage(), jLabel);
         backgroundImage.setBounds(0, 0, 900, 550);
         mainFrame.add(backgroundImage);
@@ -167,8 +167,6 @@ public class SkyWindowApp {
      */
     public static void ToGame(JLabel oldLabel) {
         oldLabel.removeAll();
-//        ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/home.jpg"));
-//        oldLabel.setIcon(theMap.mapIcon.get(theMap.mapEnum));
         JTextArea newTextDisplay = new JTextArea("光遇极简版--by zbxzbx98\n");
         newTextDisplay.setLineWrap(true);        //激活自动换行功能
         newTextDisplay.setWrapStyleWord(true);
