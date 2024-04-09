@@ -1,4 +1,4 @@
-package SkyWorld;
+package skyworld;
 
 import java.awt.*;
 import java.util.concurrent.Semaphore;

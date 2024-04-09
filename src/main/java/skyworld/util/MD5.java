@@ -1,4 +1,4 @@
-package SkyWorld;
+package skyworld.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;

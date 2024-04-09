@@ -1,4 +1,8 @@
-package SkyWorld;
+package skyworld;
+
+import skyworld.io.SimulatedUserInputStream;
+import skyworld.io.TextAreaOutputStream;
+import skyworld.util.MD5;
 
 import javax.swing.*;
 import java.awt.*;

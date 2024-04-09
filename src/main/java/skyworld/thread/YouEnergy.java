@@ -1,11 +1,13 @@
-package SkyWorld;
+package skyworld.thread;
+
+import skyworld.YouSelf;
 
 import java.util.Random;
 
 public class YouEnergy implements Runnable {
     YouSelf you;
     Sacrifice sa;
-    int type;
+    public int type;
 
     public YouEnergy(Sacrifice sa, YouSelf you) {
         type = 1;

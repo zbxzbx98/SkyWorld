@@ -36,7 +36,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>SkyWorld.SkyWindowApp</mainClass>
+                            <mainClass>skyworld.SkyWindowApp</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

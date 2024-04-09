@@ -1,4 +1,4 @@
-package SkyWorld;
+package skyworld.io;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,7 @@ import java.util.Objects;
  * @Author zbxzbx98
  * @Date 2024/4/7 下午 1:25
  */
-class SimulatedUserInputStream extends InputStream {
+public class SimulatedUserInputStream extends InputStream {
     private final StringBuilder buffer = new StringBuilder();
 
     public synchronized void addInput(String input) {

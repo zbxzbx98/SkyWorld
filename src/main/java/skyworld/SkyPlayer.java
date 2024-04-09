@@ -1,4 +1,4 @@
-package SkyWorld;
+package skyworld;
 
 import java.util.Random;
 

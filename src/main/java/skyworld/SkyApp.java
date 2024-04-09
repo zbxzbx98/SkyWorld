@@ -1,4 +1,6 @@
-package SkyWorld;
+package skyworld;
+
+import skyworld.util.MD5;
 
 import java.io.*;
 import java.util.Scanner;

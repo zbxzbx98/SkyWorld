@@ -1,4 +1,4 @@
-package SkyWorld;
+package skyworld.io;
 
 
 import javax.swing.*;
@@ -21,7 +21,7 @@ public class TextAreaOutputStream extends OutputStream {
     public TextAreaOutputStream(JTextArea outputArea) {
         this.outputArea = outputArea;
         // Set the input to be piped to our output stream
-        PipedInputStream in = null;
+        PipedInputStream in;
         try {
             in = new PipedInputStream(out);
         } catch (IOException e) {

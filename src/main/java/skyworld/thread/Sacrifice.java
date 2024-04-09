@@ -1,11 +1,11 @@
-package SkyWorld;
+package skyworld.thread;
 
 public class Sacrifice implements Runnable {
-    int get;
-    int stage = 1;
-    int damages;
-    boolean redStoneRain;
-    boolean inSafePlace;
+    public int get;
+    public int stage = 1;
+    public int damages;
+    public boolean redStoneRain;
+    public boolean inSafePlace;
 
     @Override
     public void run() {

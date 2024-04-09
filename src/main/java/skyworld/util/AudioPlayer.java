@@ -1,4 +1,4 @@
-package SkyWorld;
+package skyworld.util;
 
 import javax.sound.sampled.*;
 import java.io.IOException;

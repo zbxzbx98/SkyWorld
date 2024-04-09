@@ -1,4 +1,7 @@
-package SkyWorld;
+package skyworld;
+
+import skyworld.thread.Sacrifice;
+import skyworld.thread.YouEnergy;
 
 import java.io.*;
 import java.util.ArrayList;
