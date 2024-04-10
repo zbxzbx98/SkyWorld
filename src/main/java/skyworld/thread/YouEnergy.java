@@ -62,10 +62,10 @@ public class YouEnergy implements Runnable {
         System.out.println("你被红石砸中了！掉了" + sa.damages + "点能量，现在还剩" + String.format("%.2f", you.nowEnergy) + "点能量");
         if (you.nowEnergy == 0) {
             if (!you.black) {
-                System.out.println("你被砸黑了！掉了" + you.lostLightWing() + "个光翼！现在还剩" + you.wings_of_light + "个");
+                System.out.println("你被砸黑了！掉了" + you.lostLightWing() + "个光翼！现在还剩" + you.lightWingInfo() + "个");
                 you.black = true;
             } else {
-                System.out.println("你又被砸掉了" + you.lostLightWing() + "个光翼！现在还剩" + you.wings_of_light + "个");
+                System.out.println("你又被砸掉了" + you.lostLightWing() + "个光翼！现在还剩" + you.lightWingInfo() + "个");
             }
         }
     }

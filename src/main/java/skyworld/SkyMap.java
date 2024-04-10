@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 
@@ -13,7 +14,7 @@ public class SkyMap {
     public MapEnum mapEnum;
     public YouSelf you;
     public final String[] mapName = {"遇境", "晨岛", "云野", "雨林", "霞谷", "墓土", "禁阁", "暴风眼"};
-    public final Map<Integer, Map<Integer, String>> mapInfo;
+    public final Map<Integer, Map<Integer, ArrayList<String>>> mapInfo;
 
     public final Map<MapEnum, ImageIcon> mapIcon;
     public int mapID;
@@ -22,22 +23,14 @@ public class SkyMap {
     public SkyMap() {
         ObjectMapper objectMapper = new ObjectMapper();
         URL jsonFile = SkyMap.class.getResource("/locations.json");
-        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, Integer.class, Map.class);
-
-        Map<Integer, Map<String, String>> rawMapInfo;
+        JavaType intType = objectMapper.getTypeFactory().constructType(Integer.class);
+        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class,intType,
+                objectMapper.getTypeFactory().constructMapType(Map.class, intType,
+                        objectMapper.getTypeFactory().constructParametricType(ArrayList.class, String.class)));
         try {
-            rawMapInfo = objectMapper.readValue(jsonFile, mapType);
+            mapInfo = objectMapper.readValue(jsonFile, mapType);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        mapInfo = new HashMap<>();
-        for (Map.Entry<Integer, Map<String, String>> entry : rawMapInfo.entrySet()) {
-            Map<String, String> map = entry.getValue();
-            Map<Integer, String> newMap = new HashMap<>();
-            for (Map.Entry<String, String> entry1 : map.entrySet()) {
-                newMap.put(Integer.parseInt(entry1.getKey()), entry1.getValue());
-            }
-            mapInfo.put(entry.getKey(), newMap);
         }
         mapIcon = new HashMap<>();
         for (int i = 0; i < MapEnum.values().length; i++) {
@@ -1373,7 +1366,7 @@ public class SkyMap {
      * 显示地图及所有玩家信息
      */
     public void allPlayer() {
-        System.out.println("当前地图为：" + mapInfo.get(mapEnum.ordinal()).get(mapID));
+        System.out.println("当前地图为：" + mapInfo.get(mapEnum.ordinal()).get(mapID).get(0));
         System.out.print("当前地图内所有玩家为： ");
         for (SkyPlayer player : players) {
             System.out.print(player.name + " ");

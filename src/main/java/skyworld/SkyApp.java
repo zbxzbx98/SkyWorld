@@ -22,14 +22,14 @@ public class SkyApp {
                 String info = load(name);
                 String[] infos = info.split(" ");
                 System.out.println("请输入密码：");
-                if (infos[8].equals(MD5.encode(sc.nextLine()))) {
+                if (infos[9].equals(MD5.encode(sc.nextLine()))) {
                     System.out.println("登录成功！");
-                    you = new YouSelf(Integer.parseInt(infos[1]), Integer.parseInt(infos[2]), 1, infos[0], infos[8]);
-                    you.setLastMap(MapEnum.valueOf(infos[6]));
-                    you.setLastMapID(Integer.parseInt(infos[7]));
-                    you.candle = Double.parseDouble(infos[3]);
-                    you.heart = Double.parseDouble(infos[4]);
-                    you.redCandle = Double.parseDouble(infos[5]);
+                    you = new YouSelf(Integer.parseInt(infos[1]), Integer.parseInt(infos[2]),Integer.parseInt(infos[3]), 1, infos[0], infos[9]);
+                    you.setLastMap(MapEnum.valueOf(infos[7]));
+                    you.setLastMapID(Integer.parseInt(infos[8]));
+                    you.candle = Double.parseDouble(infos[4]);
+                    you.heart = Double.parseDouble(infos[5]);
+                    you.redCandle = Double.parseDouble(infos[6]);
                     break;
                 } else {
                     System.out.println("你输入的密码有误！");

@@ -42,6 +42,11 @@ public class SkyWindowApp {
             @Override
             public void windowClosing(WindowEvent e) {
                 isRunning = false;
+                if (you != null) {
+                    you.save();
+                    you.saveMapData();
+                    you.saveCandleData();
+                }
             }
         });
         JMenuBar bar = new JMenuBar();
@@ -69,7 +74,7 @@ public class SkyWindowApp {
             throw new RuntimeException(e);
         }
         backgroundImage.setBackgroundImage(
-                new ImageIcon(SkyWindowApp.class.getResource("/Images/BackGround.png")).getImage(),2000,500);
+                new ImageIcon(SkyWindowApp.class.getResource("/Images/BackGround.png")).getImage(), 2000, 500);
         JButton button = new JButton("登录游戏");
         button.setBounds(360, 300, 180, 70);
         button.setBackground(new Color(238, 238, 238));
@@ -120,16 +125,16 @@ public class SkyWindowApp {
 
             File file = new File("SkyWorld\\" + name + "data.txt");
             if (file.exists()) {
-                String info = load(name);
+                String info = YouSelf.load(name);
                 String[] infos = info.split(" ");
-                if (infos[8].equals(MD5.encode(new String(password.getPassword())))) {
+                if (infos[9].equals(MD5.encode(new String(password.getPassword())))) {
                     JOptionPane.showMessageDialog(null, "登录成功！");
-                    you = new YouSelf(Integer.parseInt(infos[1]), Integer.parseInt(infos[2]), 1, infos[0], infos[8]);
-                    you.setLastMap(MapEnum.valueOf(infos[6]));
-                    you.setLastMapID(Integer.parseInt(infos[7]));
-                    you.candle = Double.parseDouble(infos[3]);
-                    you.heart = Double.parseDouble(infos[4]);
-                    you.redCandle = Double.parseDouble(infos[5]);
+                    you = new YouSelf(Integer.parseInt(infos[1]), Integer.parseInt(infos[2]), Integer.parseInt(infos[3]), 1, infos[0], infos[9]);
+                    you.setLastMap(MapEnum.valueOf(infos[7]));
+                    you.setLastMapID(Integer.parseInt(infos[8]));
+                    you.candle = Double.parseDouble(infos[4]);
+                    you.heart = Double.parseDouble(infos[5]);
+                    you.redCandle = Double.parseDouble(infos[6]);
                     f.dispatchEvent(new WindowEvent(f, WindowEvent.WINDOW_CLOSING));
                     mainFrame.setTitle("光遇极简版--by zbxzbx98--已登录：" + name);
 //                    oldFrame.setEnabled(true);
@@ -203,7 +208,7 @@ public class SkyWindowApp {
         buttonPanel.setBounds(500, 350, 300, 100);
         oldLabel.add(buttonPanel);
 
-        backgroundImage.setBackgroundImage(theMap.mapIcon.get(theMap.mapEnum).getImage(),2000);
+        backgroundImage.setBackgroundImage(theMap.mapIcon.get(theMap.mapEnum).getImage(), 2000);
 
         Thread choose = new Thread(() -> {
             try {
@@ -215,6 +220,8 @@ public class SkyWindowApp {
             theMap.you = you;
             you.nowMap = theMap;
             theMap.refreshMap();
+            you.lodeMapData();
+            you.lodeCandleData();
             while (isRunning) you.choose();
         });
         choose.start();
@@ -265,18 +272,4 @@ public class SkyWindowApp {
         return buttonPanel;
     }
 
-    /**
-     * 加载文件
-     *
-     * @param name 玩家名
-     * @return 玩家信息
-     */
-    public static String load(String name) {
-        try (BufferedReader isr = new BufferedReader(new FileReader("SkyWorld\\" + name + "data.txt"))) {
-            return isr.readLine();
-        } catch (IOException e) {
-            System.err.println("读取文件失败");
-        }
-        return "";
-    }
 }

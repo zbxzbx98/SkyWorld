@@ -1,33 +1,43 @@
 package skyworld;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import skyworld.thread.Sacrifice;
 import skyworld.thread.YouEnergy;
 import skyworld.util.AudioPlayer;
 
 import java.io.*;
+import java.net.URL;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class YouSelf extends SkyPlayer {
     public ArrayList<SkyPlayer> lightUpPlayer = new ArrayList<>();
     public SkyMap nowMap;
+    public boolean black;
+    private final String password;
+
     private MapEnum lastMap;
     private int lastMapID;
-    private final String password;
-    public boolean black;
 
-    public YouSelf(int permanent_light_wing, int wings_of_light, int id, String name, String password) {
-        super(permanent_light_wing, wings_of_light, id, name);
+    private LocalDate today;
+    private int todayGetCandleCount;
+    private int todayGetFilePointCount;
+    private HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> mapData;
+
+    public YouSelf(int permanent_light_wing,int now_permanent_light_wing, int wings_of_light, int id, String name, String password) {
+        super(permanent_light_wing, now_permanent_light_wing, wings_of_light, id, name);
         this.password = password;
         lastMap = MapEnum.home;
         lastMapID = 0;
     }
 
     public YouSelf(String name, String password) {
-        permanent_light_wing = 0;
-        wings_of_light = 0;
-        id = 1;
-        this.name = name;
+        super(0,0, 0, 1, name);
         this.password = password;
         lastMap = MapEnum.home;
         lastMapID = 0;
@@ -55,11 +65,11 @@ public class YouSelf extends SkyPlayer {
     public void choose() {
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("\n你现在在" + nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID) + "！你可以：");
+        System.out.println("\n你现在在" + nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(0) + "！你可以：");
         if (lightUpPlayer.size() < nowMap.players.size() - 1) {
             System.out.println("点亮小黑 ---> 输入1");
         }
-        if (!(nowMap.mapEnum == MapEnum.home &&lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4))
+        if (!(nowMap.mapEnum == MapEnum.home && lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4))
             System.out.println("去其他地图 ---> 输入2");
         if (nowMap.mapEnum != MapEnum.home && (nowMap.mapEnum != MapEnum.eden || nowMap.mapID < 2)) {
             System.out.println("回遇境 ---> 输入3");
@@ -70,7 +80,7 @@ public class YouSelf extends SkyPlayer {
         System.out.println("观察地图及玩家 ---> 输入8");
         System.out.println("查看个人信息 ---> 输入9");
         System.out.println("退出游戏 ---> 输入0");
-        if (nowMap.mapEnum == MapEnum.home &&lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4)
+        if (nowMap.mapEnum == MapEnum.home && lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4)
             System.out.println("提示：光明在呼唤，请返回伊甸之眼继续你的升华之旅");
         while (true) {
             switch (sc.nextInt()) {
@@ -83,7 +93,7 @@ public class YouSelf extends SkyPlayer {
                     }
                 }
                 case 2 -> {
-                    if (nowMap.mapEnum == MapEnum.home &&lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4) {
+                    if (nowMap.mapEnum == MapEnum.home && lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4) {
                         System.out.println("提示：光明在呼唤，请返回伊甸之眼继续你的升华之旅");
                         continue;
                     }
@@ -158,7 +168,7 @@ public class YouSelf extends SkyPlayer {
         th1.start();
         th2.start();
         while (wings_of_light > 0) {
-            System.out.println("你现在还剩" + wings_of_light + "个光翼，" + String.format("%.2f", nowEnergy) + "点能量,你现在可以：");
+            System.out.println("你现在还剩" + lightWingInfo() + "个光翼，" + String.format("%.2f", nowEnergy) + "点能量,你现在可以：");
             if (sa.stage == 1) {
                 System.out.println("冲入红石雨点石像（1s） ---> 输入1");
                 System.out.println("留在掩体等候（1s） ---> 输入2");
@@ -177,9 +187,9 @@ public class YouSelf extends SkyPlayer {
                         }
                         Thread.sleep(1000);
                         if (sa.nextStatue()) {
-                            wings_of_light--;
-                            System.out.println("你点到了一个石像！现在还剩" + wings_of_light + "个光翼");
-                            if (wings_of_light < 0) {
+                            userLightWing();
+                            System.out.println("你点到了一个石像！现在还剩" + lightWingInfo() + "个光翼");
+                            if (lightWingInfo() <= 0) {
                                 System.out.println("你没有光翼可以献祭了！");
                             }
                         } else
@@ -206,8 +216,6 @@ public class YouSelf extends SkyPlayer {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-//        th1.interrupt();
-//        th2.interrupt();
         ye.type = -1;
         sa.stage = -1;
         double get = (double) sa.get / 4;
@@ -252,10 +260,128 @@ public class YouSelf extends SkyPlayer {
      */
     public String getInfo() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name).append(" ").append(permanent_light_wing).append(" ").append(wings_of_light).append(" ")
-                .append(candle).append(" ").append(heart).append(" ").append(redCandle)
+        sb.append(name).append(" ").append(permanent_light_wing).append(" ").append(now_permanent_light_wing).append(" ")
+                .append(wings_of_light).append(" ").append(candle).append(" ").append(heart).append(" ").append(redCandle)
                 .append(" ").append(lastMap.name()).append(" ").append(lastMapID).append(" ").append(password);
         return sb.toString();
+    }
+
+    /**
+     * 读取玩家蜡烛信息
+     */
+    public void lodeCandleData() {
+        File file = new File("SkyWorld\\" + name + "CandleData.txt");
+        if (file.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line = br.readLine();
+                String[] data = line.split(" ");
+                today = LocalDate.now();
+                if (!data[0].equals(today.toString())) {
+                    todayGetCandleCount = 0;
+                    todayGetFilePointCount = Integer.parseInt(data[2]);
+                    //TODO 储存昨日蜡烛数据
+                    clearMapCandleData();
+                    saveCandleData();
+                } else {
+                    todayGetCandleCount = Integer.parseInt(data[1]);
+                    todayGetFilePointCount = Integer.parseInt(data[2]);
+                }
+            } catch (IOException e) {
+                System.err.println("读取玩家蜡烛信息失败:" + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 保存玩家蜡烛信息
+     */
+    public void saveCandleData() {
+        File directory = new File("SkyWorld\\");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        try (PrintWriter osw = new PrintWriter(new File(directory, name + "CandleData.txt"))) {
+            osw.print(today.toString() + " " + todayGetCandleCount + " " + todayGetFilePointCount);
+        } catch (IOException e) {
+            System.err.println("保存玩家蜡烛信息失败:" + e.getMessage());
+        }
+    }
+
+    /**
+     * 读取玩家地图数据
+     */
+    public void lodeMapData() {
+        File file = new File("SkyWorld\\" + name + "MapData.txt");
+        if (file.exists()) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JavaType intType = objectMapper.getTypeFactory().constructType(Integer.class);
+            MapType mapType = objectMapper.getTypeFactory().constructMapType(HashMap.class, intType,
+                    objectMapper.getTypeFactory().constructMapType(HashMap.class, intType,
+                            objectMapper.getTypeFactory().constructParametricType(ArrayList.class, Integer.class)));
+            try {
+                mapData = objectMapper.readValue(file, mapType);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            creatMapData();
+        }
+    }
+
+    /**
+     * 创建地图数据
+     */
+    public void creatMapData() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        URL jsonFile = SkyMap.class.getResource("/baseMapData.json");
+        JavaType intType = objectMapper.getTypeFactory().constructType(Integer.class);
+        MapType mapType = objectMapper.getTypeFactory().constructMapType(HashMap.class, intType,
+                objectMapper.getTypeFactory().constructMapType(HashMap.class, intType,
+                        objectMapper.getTypeFactory().constructParametricType(ArrayList.class, Integer.class)));
+        try {
+            mapData = objectMapper.readValue(jsonFile, mapType);
+            saveMapData();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 保存地图数据
+     */
+    public void saveMapData() {
+        File directory = new File("SkyWorld\\");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        try (PrintWriter osw = new PrintWriter(new File(directory, name + "MapData.txt"))) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(osw, mapData);
+        } catch (IOException e) {
+            System.err.println("保存地图数据失败:" + e.getMessage());
+        }
+    }
+
+    public int sumMapDataLightWing(){
+        int sum = 0;
+        for (HashMap<Integer, ArrayList<Integer>> innerMap : mapData.values()) {
+            for (ArrayList<Integer> list : innerMap.values()) {
+                if (!list.isEmpty()) { // 确保列表非空，避免抛出 IndexOutOfBoundsException
+                    sum += list.get(0);
+                }
+            }
+        }
+        return sum;
+    }
+
+    public void clearMapCandleData() {
+        for (HashMap<Integer, ArrayList<Integer>> innerMap : mapData.values()) {
+            for (ArrayList<Integer> list : innerMap.values()) {
+                if (list.size() >= 2) { // 确保列表长度至少为 2，避免抛出 IndexOutOfBoundsException
+                    list.set(1, 0); // 设置第二个元素为 0
+                }
+            }
+        }
     }
 
     /**
@@ -269,36 +395,97 @@ public class YouSelf extends SkyPlayer {
         try (PrintWriter osw = new PrintWriter(new File(directory, name + "data.txt"))) {
             osw.print(getInfo());
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("保存玩家信息失败:" + e.getMessage());
         }
     }
 
     /**
-     * 掉光翼
+     * 加载文件
      *
+     * @param name 玩家名
+     * @return 玩家信息
+     */
+    public static String load(String name) {
+        try (BufferedReader isr = new BufferedReader(new FileReader("SkyWorld\\" + name + "data.txt"))) {
+            return isr.readLine();
+        } catch (IOException e) {
+            System.err.println("读取文件失败:" + e.getMessage());
+        }
+        return "";
+    }
+
+    /**
+     * 掉光翼
      * @return 掉光翼的数量
      */
     public int lostLightWing() {
         int lost = 0;
-        if (wings_of_light <= 0) {
-            wings_of_light = 0;
-        } else if (wings_of_light < 50) {
-            wings_of_light -= 1;
-            lost = 1;
-        } else if (wings_of_light < 80) {
-            wings_of_light -= 2;
-            lost = 2;
-        } else if (wings_of_light < 100) {
-            wings_of_light -= 3;
-            lost = 3;
-        } else if (wings_of_light < 120) {
-            wings_of_light -= 4;
-            lost = 4;
-        } else {
-            wings_of_light -= 5;
-            lost = 5;
+        int sum = lightWingInfo();
+        if (wings_of_light > 0) {
+            if (sum < 50) {
+                wings_of_light -= 1;
+                lost = 1;
+            } else if (sum < 80) {
+                wings_of_light -= 2;
+                lost = 2;
+            } else if (sum < 100) {
+                wings_of_light -= 3;
+                lost = 3;
+            } else if (sum < 120) {
+                wings_of_light -= 4;
+                lost = 4;
+            } else {
+                wings_of_light -= 5;
+                lost = 5;
+            }
+            if (wings_of_light < 0) {
+                now_permanent_light_wing += wings_of_light;
+                lostNomel(lost+wings_of_light);
+                wings_of_light = 0;
+            }
+            if(now_permanent_light_wing<0)
+                now_permanent_light_wing=0;
         }
         AudioPlayer.playLost(lost);
         return lost;
+    }
+
+    /**
+     * 扣除普通翼
+     *
+     * @param i 扣普通光翼的数量
+     */
+    private void lostNomel(int i) {
+        if(i<=0)
+            return;
+        for (HashMap<Integer, ArrayList<Integer>> positionMapEntry : mapData.values()) {
+            for (ArrayList<Integer> positionEntry : positionMapEntry.values()) {
+                if(positionEntry.get(0)>0){
+                    if(positionEntry.get(0)-i>=0){
+                        positionEntry.set(0,positionEntry.get(0)-i);
+                        return;
+                    }
+                    if(positionEntry.get(0)-i<0){
+                        i-=positionEntry.get(0);
+                        positionEntry.set(0,0);
+                    }
+                }
+            }
+        }
+        if(i>0)
+            System.err.println("普通翼扣除异常");
+    }
+
+    /**
+     * 使用光翼
+     */
+    public void userLightWing() {
+        if(wings_of_light>0){
+            wings_of_light--;
+            lostNomel(1);
+        }
+        else if(permanent_light_wing>0){
+            now_permanent_light_wing--;
+        }
     }
 }
