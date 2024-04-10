@@ -15,13 +15,14 @@ public class BackgroundImage extends JComponent {
     private final JLabel oldLabel;
     private float currentOpacity;
     private float startOpacity, endOpacity;
-    private long animationDurationMs, animationStartTimestamp;
+    private long animationDurationMs, animationStartTimestamp,animationOutMs;
     private Timer fadeTimer;
     private static final Semaphore semaphore = new Semaphore(1);
 
     public BackgroundImage(Image backgroundImage, JLabel oldLabel) {
         this.backgroundImage = backgroundImage;
-        this.currentOpacity = 1.0f;
+        nextBackgroundImage = backgroundImage;
+        this.currentOpacity = 0.0f;
         this.oldLabel = oldLabel;
         fadeTimer = new Timer(20, e -> {
             updateOpacity();
@@ -30,16 +31,30 @@ public class BackgroundImage extends JComponent {
                 fadeTimer.stop();
                 if (nextBackgroundImage != this.backgroundImage) {
                     this.backgroundImage = nextBackgroundImage;
-                    startFadeAnimation(0, 1, 500);
+                    startFadeAnimation(0, 1, animationOutMs);
                 } else {
                     oldLabel.setVisible(true);
                     semaphore.release();
                 }
             }
         });
+        try {
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        startFadeAnimation(0, 1, 2000);
     }
 
     public void setBackgroundImage(Image backgroundImage) {
+        setBackgroundImage(backgroundImage,500,500);
+    }
+
+    public void setBackgroundImage(Image backgroundImage,long time) {
+        setBackgroundImage(backgroundImage, time, time);
+    }
+
+    public void setBackgroundImage(Image backgroundImage,long inTime,long outTime) {
         if (backgroundImage == this.backgroundImage || backgroundImage == this.nextBackgroundImage)
             return;
         try {
@@ -49,7 +64,8 @@ public class BackgroundImage extends JComponent {
         }
         oldLabel.setVisible(false);
         this.nextBackgroundImage = backgroundImage;
-        startFadeAnimation(1, 0, 500);
+        this.animationOutMs = outTime;
+        startFadeAnimation(1, 0, inTime);
     }
 
     private void startFadeAnimation(float startOpacity, float endOpacity, long animationDurationMs) {

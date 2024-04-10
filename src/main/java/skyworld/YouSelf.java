@@ -2,6 +2,7 @@ package skyworld;
 
 import skyworld.thread.Sacrifice;
 import skyworld.thread.YouEnergy;
+import skyworld.util.AudioPlayer;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class YouSelf extends SkyPlayer {
         if (lightUpPlayer.size() < nowMap.players.size() - 1) {
             System.out.println("点亮小黑 ---> 输入1");
         }
-        if (!(lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4))
+        if (!(nowMap.mapEnum == MapEnum.home &&lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4))
             System.out.println("去其他地图 ---> 输入2");
         if (nowMap.mapEnum != MapEnum.home && (nowMap.mapEnum != MapEnum.eden || nowMap.mapID < 2)) {
             System.out.println("回遇境 ---> 输入3");
@@ -69,8 +70,8 @@ public class YouSelf extends SkyPlayer {
         System.out.println("观察地图及玩家 ---> 输入8");
         System.out.println("查看个人信息 ---> 输入9");
         System.out.println("退出游戏 ---> 输入0");
-        if (lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4)
-            System.out.println("提示：光明在呼唤，请返回伊甸字眼继续你的升华之旅");
+        if (nowMap.mapEnum == MapEnum.home &&lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4)
+            System.out.println("提示：光明在呼唤，请返回伊甸之眼继续你的升华之旅");
         while (true) {
             switch (sc.nextInt()) {
                 case 1 -> {
@@ -82,8 +83,8 @@ public class YouSelf extends SkyPlayer {
                     }
                 }
                 case 2 -> {
-                    if (lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4) {
-                        System.out.println("提示：光明在呼唤，请返回伊甸字眼继续你的升华之旅");
+                    if (nowMap.mapEnum == MapEnum.home &&lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4) {
+                        System.out.println("提示：光明在呼唤，请返回伊甸之眼继续你的升华之旅");
                         continue;
                     }
                     nowMap.goToOtherMap(sc);
@@ -278,21 +279,26 @@ public class YouSelf extends SkyPlayer {
      * @return 掉光翼的数量
      */
     public int lostLightWing() {
-        if (wings_of_light < 50) {
+        int lost = 0;
+        if (wings_of_light <= 0) {
+            wings_of_light = 0;
+        } else if (wings_of_light < 50) {
             wings_of_light -= 1;
-            return 1;
+            lost = 1;
         } else if (wings_of_light < 80) {
             wings_of_light -= 2;
-            return 2;
+            lost = 2;
         } else if (wings_of_light < 100) {
             wings_of_light -= 3;
-            return 3;
+            lost = 3;
         } else if (wings_of_light < 120) {
             wings_of_light -= 4;
-            return 4;
+            lost = 4;
         } else {
             wings_of_light -= 5;
-            return 5;
+            lost = 5;
         }
+        AudioPlayer.playLost(lost);
+        return lost;
     }
 }

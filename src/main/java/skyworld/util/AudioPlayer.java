@@ -1,11 +1,14 @@
 package skyworld.util;
 
 import javax.sound.sampled.*;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackListener;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 import org.tritonus.share.sampled.file.TAudioFileReader;
 
@@ -17,6 +20,10 @@ import org.tritonus.share.sampled.file.TAudioFileReader;
  * @Date 2024/4/8 下午 3:03
  */
 public class AudioPlayer {
+    private static AdvancedPlayer bgmPlayer;
+    private static final TAudioFileReader reader= new MpegAudioFileReader();
+    private static Thread breakThread;
+    public static int breakCount = 0;
 
     /**
      * 启动新线程播放音频
@@ -27,6 +34,53 @@ public class AudioPlayer {
         new Thread(() -> play(path)).start();
     }
 
+    public static void startBgm(String name) {
+        stopBgm();
+        new Thread(() -> playBgm(name)).start();
+    }
+
+    public static void stopBgm() {
+        if(bgmPlayer!=null)
+            bgmPlayer.stop();
+    }
+
+    public static void playLost(int breakCount) {
+        new Thread(() -> {
+            try {
+                Player lostPlayer = new Player(reader.getAudioInputStream(AudioPlayer.class.getResource("/Audios/lost.mp3")));
+                lostPlayer.play();
+                Thread.sleep(2000);
+                playBreak(breakCount);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    private static void playBreak(int count) {
+        breakCount+=count;
+        if (breakThread==null || !breakThread.isAlive()) {
+            breakThread = new Thread(() -> {
+                while (breakCount>0) {
+                    try {
+                        new Thread(()->{
+                            try {
+                                Player breakPlayer = new Player(reader.getAudioInputStream(AudioPlayer.class.getResource("/Audios/break.mp3")));
+                                breakPlayer.play();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        }).start();
+                        breakCount--;
+                        Thread.sleep(1000);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+            breakThread.start();
+        }
+    }
     /**
      * 播放音频
      *
@@ -36,7 +90,6 @@ public class AudioPlayer {
         URL url = AudioPlayer.class.getResource(name);
         if (url != null) {
             if (".mp3".equals(name.substring(name.lastIndexOf(".")))) {
-                TAudioFileReader reader = new MpegAudioFileReader();
                 try (AudioInputStream audioInputStream = reader.getAudioInputStream(url)) {
                     Player player = new Player(audioInputStream);
                     player.play();
@@ -46,28 +99,29 @@ public class AudioPlayer {
                     throw new RuntimeException(e);
                 }
             }
-//            else if(".wav".equals(name.substring(name.lastIndexOf(".")))){
-//                try (AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(url)) {
-//                    playClip(audioInputStream);
-//                } catch (UnsupportedAudioFileException | IOException e) {
-//                    System.err.println("Failed to open audio file: " + e.getMessage());
-//                }
-//            }
             else
                 System.err.println("Unsupported audio file format: " + name);
         } else
             System.err.println("Failed to find audio file: " + name);
     }
 
-//    private static void playClip(AudioInputStream audioInputStream) {
-//        try {
-//            Clip clip = AudioSystem.getClip();
-//            clip.open(audioInputStream);
-//            clip.start();
-//        }
-//        catch (LineUnavailableException | IOException e){
-//            System.err.println("Failed to play audio clip: " + e.getMessage());
-//        }
-//
-//    }
+    private static void playBgm(String name) {
+        URL url = AudioPlayer.class.getResource(name);
+        if (url != null) {
+            if (".mp3".equals(name.substring(name.lastIndexOf(".")))) {
+                try (FileInputStream inputStream = new FileInputStream(url.getPath())) {
+                    bgmPlayer = new AdvancedPlayer(inputStream);
+                    bgmPlayer.setPlayBackListener(new PlaybackListener(){});
+                    bgmPlayer.play();
+                } catch (IOException e) {
+                    System.err.println("Error opening file: " + e.getMessage());
+                } catch (JavaLayerException e) {
+                    System.err.println("Error playing audio: " + e.getMessage());
+                }
+            }
+            else
+                System.err.println("Unsupported audio file format: " + name);
+        } else
+            System.err.println("Failed to find audio file: " + name);
+    }
 }

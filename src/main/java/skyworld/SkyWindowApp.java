@@ -2,6 +2,7 @@ package skyworld;
 
 import skyworld.io.SimulatedUserInputStream;
 import skyworld.io.TextAreaOutputStream;
+import skyworld.util.AudioPlayer;
 import skyworld.util.MD5;
 
 import javax.swing.*;
@@ -53,15 +54,22 @@ public class SkyWindowApp {
         menu.add(menu3);
         bar.add(menu);
         mainFrame.setJMenuBar(bar);
-//        AudioPlayer.startPlay("/test.mp3");
+        AudioPlayer.startPlay("/Audios/start.mp3");
         theMap.mapEnum = MapEnum.home;
         theMap.mapID = 0;
         JLabel jLabel = new JLabel();
-        ImageIcon imageIcon = new ImageIcon(SkyWindowApp.class.getResource("/Images/BackGround.png"));
-        backgroundImage = new BackgroundImage(imageIcon.getImage(), jLabel);
+        backgroundImage = new BackgroundImage(
+                new ImageIcon(SkyWindowApp.class.getResource("/Images/start.jpg")).getImage(), jLabel);
         backgroundImage.setBounds(0, 0, 900, 550);
         mainFrame.add(backgroundImage);
-        mainFrame.add(jLabel);
+        mainFrame.setVisible(true);
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        backgroundImage.setBackgroundImage(
+                new ImageIcon(SkyWindowApp.class.getResource("/Images/BackGround.png")).getImage(),2000,500);
         JButton button = new JButton("登录游戏");
         button.setBounds(360, 300, 180, 70);
         button.setBackground(new Color(238, 238, 238));
@@ -70,7 +78,8 @@ public class SkyWindowApp {
             Longin(jLabel);
         });
         jLabel.add(button);
-        mainFrame.setVisible(true);
+        mainFrame.add(jLabel);
+
     }
 
     /**
@@ -170,6 +179,7 @@ public class SkyWindowApp {
      * @param oldLabel 旧界面
      */
     public static void ToGame(JLabel oldLabel) {
+        AudioPlayer.startBgm("/Audios/begin.mp3");
         oldLabel.removeAll();
         JTextArea newTextDisplay = new JTextArea("光遇极简版--by zbxzbx98\n");
         newTextDisplay.setLineWrap(true);        //激活自动换行功能
@@ -193,11 +203,18 @@ public class SkyWindowApp {
         buttonPanel.setBounds(500, 350, 300, 100);
         oldLabel.add(buttonPanel);
 
-        theMap.addPlayer(you);
-        theMap.you = you;
-        you.nowMap = theMap;
-        theMap.refreshMap();
+        backgroundImage.setBackgroundImage(theMap.mapIcon.get(theMap.mapEnum).getImage(),2000);
+
         Thread choose = new Thread(() -> {
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            theMap.addPlayer(you);
+            theMap.you = you;
+            you.nowMap = theMap;
+            theMap.refreshMap();
             while (isRunning) you.choose();
         });
         choose.start();
@@ -206,6 +223,7 @@ public class SkyWindowApp {
             while (isRunning) {
                 if (theMap.mapEnum != beforMapEnum) {
                     beforMapEnum = theMap.mapEnum;
+                    AudioPlayer.stopBgm();
                     backgroundImage.setBackgroundImage(theMap.mapIcon.get(theMap.mapEnum).getImage());
                 }
                 try {
@@ -216,8 +234,6 @@ public class SkyWindowApp {
             }
         });
         changeImage.start();
-        backgroundImage.setBackgroundImage(theMap.mapIcon.get(theMap.mapEnum).getImage());
-        oldLabel.validate();
     }
 
     /**
