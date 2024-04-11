@@ -11,7 +11,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 
-//光遇界面
+/**
+ * 窗口版光遇界面
+ */
 public class SkyWindowApp {
     static YouSelf you = null;
 
@@ -159,7 +161,7 @@ public class SkyWindowApp {
                 }
                 JOptionPane.showMessageDialog(null, "注册成功！");
                 you = new YouSelf(username.getText(), MD5.encode(new String(password.getPassword())));
-                you.save();
+//                you.save();
                 f.dispatchEvent(new WindowEvent(f, WindowEvent.WINDOW_CLOSING));
                 mainFrame.setTitle("光遇极简版--by zbxzbx98--已登录：" + username.getText());
                 ToGame(oldLabel);
@@ -222,6 +224,7 @@ public class SkyWindowApp {
             theMap.refreshMap();
             you.lodeMapData();
             you.lodeCandleData();
+            you.save();
             while (isRunning) you.choose();
         });
         choose.start();

@@ -1355,10 +1355,11 @@ public class SkyMap {
         int num = r.nextInt(7) + 1;
         while (num > 0) {
             SkyPlayer newPlayer = new SkyPlayer();
-            System.out.println(newPlayer.name + " 进入了地图");
+            System.out.print(newPlayer.name + " ");
             players.add(newPlayer);
             num--;
         }
+        System.out.println("进入了地图!");
         allPlayer();
     }
 
@@ -1371,11 +1372,13 @@ public class SkyMap {
         for (SkyPlayer player : players) {
             System.out.print(player.name + " ");
         }
+        System.out.println();
         if (!you.lightUpPlayer.isEmpty()) {
-            System.out.print("\n你点亮的所有玩家为： ");
+            System.out.print("你点亮的所有玩家为： ");
             for (SkyPlayer player : you.lightUpPlayer) {
                 System.out.print(player.name + " ");
             }
+            System.out.println();
         }
     }
 }

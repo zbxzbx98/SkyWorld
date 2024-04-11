@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.type.MapType;
 import skyworld.thread.Sacrifice;
 import skyworld.thread.YouEnergy;
 import skyworld.util.AudioPlayer;
+import skyworld.util.WhileCandleRule;
 
 import java.io.*;
 import java.net.URL;
@@ -27,9 +28,12 @@ public class YouSelf extends SkyPlayer {
     private LocalDate today;
     private int todayGetCandleCount;
     private int todayGetFilePointCount;
+    private double beforeGetCandleCount;
+    private final WhileCandleRule whileCandleRule = new WhileCandleRule();
+
     private HashMap<Integer, HashMap<Integer, ArrayList<Integer>>> mapData;
 
-    public YouSelf(int permanent_light_wing,int now_permanent_light_wing, int wings_of_light, int id, String name, String password) {
+    public YouSelf(int permanent_light_wing, int now_permanent_light_wing, int wings_of_light, int id, String name, String password) {
         super(permanent_light_wing, now_permanent_light_wing, wings_of_light, id, name);
         this.password = password;
         lastMap = MapEnum.home;
@@ -37,7 +41,7 @@ public class YouSelf extends SkyPlayer {
     }
 
     public YouSelf(String name, String password) {
-        super(0,0, 0, 1, name);
+        super(0, 0, 0, 1, name);
         this.password = password;
         lastMap = MapEnum.home;
         lastMapID = 0;
@@ -64,8 +68,8 @@ public class YouSelf extends SkyPlayer {
      */
     public void choose() {
         Scanner sc = new Scanner(System.in);
-
-        System.out.println("\n你现在在" + nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(0) + "！你可以：");
+        System.out.println("------------------------");
+        System.out.println("你现在在" + nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(0) + "！你可以：");
         if (lightUpPlayer.size() < nowMap.players.size() - 1) {
             System.out.println("点亮小黑 ---> 输入1");
         }
@@ -77,11 +81,19 @@ public class YouSelf extends SkyPlayer {
         if (nowMap.mapEnum == MapEnum.home && lastMap != null && lastMap != MapEnum.home) {
             System.out.println("坐神坛 ---> 输入4");
         }
+        if (nowMapFilePointInfo() > 0) {
+            System.out.println("收集地图中的烛火 ---> 输入5");
+        }
+        if (nowMapLightWingInfo() > 0) {
+            System.out.println("收集地图中的光翼 ---> 输入6");
+        }
+        System.out.println("合成蜡烛 ---> 输入7");
         System.out.println("观察地图及玩家 ---> 输入8");
         System.out.println("查看个人信息 ---> 输入9");
         System.out.println("退出游戏 ---> 输入0");
         if (nowMap.mapEnum == MapEnum.home && lastMap == MapEnum.eden && lastMapID >= 2 && lastMapID <= 4)
             System.out.println("提示：光明在呼唤，请返回伊甸之眼继续你的升华之旅");
+        System.out.println("------------------------");
         while (true) {
             switch (sc.nextInt()) {
                 case 1 -> {
@@ -129,6 +141,18 @@ public class YouSelf extends SkyPlayer {
                         nowMap.refreshMap();
                         return;
                     }
+                }
+                case 5 -> {
+                    getNowMapFilePoint();
+                    return;
+                }
+                case 6 -> {
+                    getNowMapLightWing();
+                    return;
+                }
+                case 7 -> {
+                    syntheticCandle();
+                    return;
                 }
                 case 8 -> {
                     nowMap.allPlayer();
@@ -233,15 +257,16 @@ public class YouSelf extends SkyPlayer {
      * 重生
      */
     public void congSeng() {
-        wings_of_light++;
-        getMaxEnergy();
-        start();
-        System.out.println("你重生了！当前光翼数:" + wings_of_light + "光翼," + maxEnergy + "翼");
+        mapData.get(7).get(4).set(0, 1);
         nowMap.mapEnum = MapEnum.home;
         nowMap.mapID = 0;
         lastMap = MapEnum.home;
         lastMapID = 0;
+        now_permanent_light_wing = permanent_light_wing;
         save();
+        getMaxEnergy();
+        start();
+        System.out.println("你重生了！当前光翼数:" + lightWingInfo() + "光翼," + maxEnergy + "翼");
     }
 
     /**
@@ -277,18 +302,87 @@ public class YouSelf extends SkyPlayer {
                 String[] data = line.split(" ");
                 today = LocalDate.now();
                 if (!data[0].equals(today.toString())) {
-                    todayGetCandleCount = 0;
+                    todayGetCandleCount = Integer.parseInt(data[1]);
                     todayGetFilePointCount = Integer.parseInt(data[2]);
-                    //TODO 储存昨日蜡烛数据
+                    beforeGetCandleCount = Double.parseDouble(data[3]);
+                    int get = whileCandleRule.calculateCandle(todayGetCandleCount, todayGetFilePointCount);
+                    int surplus = whileCandleRule.calculateSurplus(todayGetCandleCount, todayGetFilePointCount);
+                    double sumGet = (double) get + whileCandleRule.calculateNextNeedCandlelightProgress(todayGetCandleCount + get, surplus);
+                    beforeGetCandleCount += sumGet;
+                    todayGetFilePointCount = 0;
+                    todayGetCandleCount = 0;
                     clearMapCandleData();
+                    saveMapData();
                     saveCandleData();
                 } else {
                     todayGetCandleCount = Integer.parseInt(data[1]);
                     todayGetFilePointCount = Integer.parseInt(data[2]);
+                    beforeGetCandleCount = Double.parseDouble(data[3]);
                 }
             } catch (IOException e) {
                 System.err.println("读取玩家蜡烛信息失败:" + e.getMessage());
             }
+        } else {
+            beforeGetCandleCount = 0;
+            todayGetFilePointCount = 0;
+            todayGetCandleCount = 0;
+            today = LocalDate.now();
+            saveCandleData();
+        }
+
+    }
+
+    /**
+     * 获取当前地图烛火数
+     */
+    public int nowMapFilePointInfo() {
+        return Integer.parseInt(nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(2));
+    }
+
+    /**
+     * 收集当前地图烛火
+     */
+    public void getNowMapFilePoint() {
+        int nowMapFilePoint = nowMapFilePointInfo();
+        if (nowMapFilePoint <= 0) {
+            System.out.println("当前地图没有烛火点!");
+            return;
+        }
+        if (mapData.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(1) < nowMapFilePoint) {
+            System.out.println("正在收集当前地图烛火...（3s）");
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            todayGetFilePointCount += nowMapFilePoint;
+            mapData.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).set(1, nowMapFilePoint);
+            saveCandleData();
+            saveMapData();
+            System.out.println("你收集了" + nowMapFilePoint + "个烛火点！");
+        } else {
+            System.out.println("你今天已经拿过当前地图的烛火了！");
+        }
+    }
+
+    /**
+     * 合成蜡烛
+     */
+    public void syntheticCandle() {
+        int get = whileCandleRule.calculateCandle(todayGetCandleCount, todayGetFilePointCount);
+        int surplus = whileCandleRule.calculateSurplus(todayGetCandleCount, todayGetFilePointCount);
+        double addGetProgress = whileCandleRule.calculateNextNeedCandlelightProgress(todayGetCandleCount + get, surplus);
+        beforeGetCandleCount += get;
+        todayGetFilePointCount = surplus;
+        todayGetCandleCount += get;
+        if (beforeGetCandleCount+addGetProgress < 1) {
+            System.out.println("你拥有的烛火点不足以合成下一个蜡烛!");
+        } else{
+            get = (int) (beforeGetCandleCount+addGetProgress);
+            beforeGetCandleCount = beforeGetCandleCount - get + addGetProgress;
+            candle += get;
+            System.out.println("你合成了" + get + "根蜡烛!");
+            saveCandleData();
         }
     }
 
@@ -301,7 +395,7 @@ public class YouSelf extends SkyPlayer {
             directory.mkdirs();
         }
         try (PrintWriter osw = new PrintWriter(new File(directory, name + "CandleData.txt"))) {
-            osw.print(today.toString() + " " + todayGetCandleCount + " " + todayGetFilePointCount);
+            osw.print(today.toString() + " " + todayGetCandleCount + " " + todayGetFilePointCount + " " + beforeGetCandleCount);
         } catch (IOException e) {
             System.err.println("保存玩家蜡烛信息失败:" + e.getMessage());
         }
@@ -347,6 +441,46 @@ public class YouSelf extends SkyPlayer {
     }
 
     /**
+     * 获取当前地图的光翼信息
+     *
+     * @return 光翼数
+     */
+    public int nowMapLightWingInfo() {
+        return Integer.parseInt(nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(1));
+    }
+
+    /**
+     * 收集当前地图的光翼
+     */
+    public void getNowMapLightWing() {
+        int nowMapLightWing = nowMapLightWingInfo();
+        if (nowMapLightWing <= 0) {
+            System.out.println("当前地图没有可收集的光翼！");
+            return;
+        }
+        if (mapData.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(0) < nowMapLightWing) {
+            System.out.println("正在收集当前地图光翼...");
+            for (int i = 0; i < nowMapLightWing; i++) {
+                try {
+                    AudioPlayer.startPlay("/Audios/get.mp3");
+                    Thread.sleep(6000);
+                    if (nowMapLightWing - i - 1 > 0)
+                        System.out.println("收集了1个光翼，当前地图还剩" + (nowMapLightWing - i - 1) + "个光翼...");
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            mapData.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).set(0, nowMapLightWing);
+            save();
+            saveMapData();
+            System.out.println("收集完成！你一共收集了" + nowMapLightWing + "个光翼！");
+        } else {
+            System.out.println("你已经拿过当前地图的光翼了！");
+        }
+
+    }
+
+    /**
      * 保存地图数据
      */
     public void saveMapData() {
@@ -362,7 +496,12 @@ public class YouSelf extends SkyPlayer {
         }
     }
 
-    public int sumMapDataLightWing(){
+    /**
+     * 获取地图中已收集的光翼总数
+     *
+     * @return 已收集的光翼总数
+     */
+    public int sumMapDataLightWing() {
         int sum = 0;
         for (HashMap<Integer, ArrayList<Integer>> innerMap : mapData.values()) {
             for (ArrayList<Integer> list : innerMap.values()) {
@@ -374,6 +513,9 @@ public class YouSelf extends SkyPlayer {
         return sum;
     }
 
+    /**
+     * 清空地图中已收集的蜡烛数据
+     */
     public void clearMapCandleData() {
         for (HashMap<Integer, ArrayList<Integer>> innerMap : mapData.values()) {
             for (ArrayList<Integer> list : innerMap.values()) {
@@ -388,6 +530,7 @@ public class YouSelf extends SkyPlayer {
      * 保存玩家信息
      */
     public void save() {
+        wings_of_light = sumMapDataLightWing();
         File directory = new File("SkyWorld\\");
         if (!directory.exists()) {
             directory.mkdirs();
@@ -400,7 +543,7 @@ public class YouSelf extends SkyPlayer {
     }
 
     /**
-     * 加载文件
+     * 加载玩家信息
      *
      * @param name 玩家名
      * @return 玩家信息
@@ -416,6 +559,7 @@ public class YouSelf extends SkyPlayer {
 
     /**
      * 掉光翼
+     *
      * @return 掉光翼的数量
      */
     public int lostLightWing() {
@@ -440,11 +584,11 @@ public class YouSelf extends SkyPlayer {
             }
             if (wings_of_light < 0) {
                 now_permanent_light_wing += wings_of_light;
-                lostNomel(lost+wings_of_light);
+                lostNomel(lost + wings_of_light);
                 wings_of_light = 0;
             }
-            if(now_permanent_light_wing<0)
-                now_permanent_light_wing=0;
+            if (now_permanent_light_wing < 0)
+                now_permanent_light_wing = 0;
         }
         AudioPlayer.playLost(lost);
         return lost;
@@ -456,23 +600,23 @@ public class YouSelf extends SkyPlayer {
      * @param i 扣普通光翼的数量
      */
     private void lostNomel(int i) {
-        if(i<=0)
+        if (i <= 0)
             return;
         for (HashMap<Integer, ArrayList<Integer>> positionMapEntry : mapData.values()) {
             for (ArrayList<Integer> positionEntry : positionMapEntry.values()) {
-                if(positionEntry.get(0)>0){
-                    if(positionEntry.get(0)-i>=0){
-                        positionEntry.set(0,positionEntry.get(0)-i);
+                if (positionEntry.get(0) > 0) {
+                    if (positionEntry.get(0) - i >= 0) {
+                        positionEntry.set(0, positionEntry.get(0) - i);
                         return;
                     }
-                    if(positionEntry.get(0)-i<0){
-                        i-=positionEntry.get(0);
-                        positionEntry.set(0,0);
+                    if (positionEntry.get(0) - i < 0) {
+                        i -= positionEntry.get(0);
+                        positionEntry.set(0, 0);
                     }
                 }
             }
         }
-        if(i>0)
+        if (i > 0)
             System.err.println("普通翼扣除异常");
     }
 
@@ -480,11 +624,10 @@ public class YouSelf extends SkyPlayer {
      * 使用光翼
      */
     public void userLightWing() {
-        if(wings_of_light>0){
+        if (wings_of_light > 0) {
             wings_of_light--;
             lostNomel(1);
-        }
-        else if(permanent_light_wing>0){
+        } else if (permanent_light_wing > 0) {
             now_permanent_light_wing--;
         }
     }

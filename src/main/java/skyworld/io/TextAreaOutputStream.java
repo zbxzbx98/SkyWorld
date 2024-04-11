@@ -47,7 +47,7 @@ public class TextAreaOutputStream extends OutputStream {
             String text = new String(chars, 0, n);
             // Write the text to the JTextArea
             outputArea.append(text);
-            if (outputArea.getLineCount() > 22) {
+            if (outputArea.getLineCount() > 23) {
                 outputArea.setText(outputArea.getText().substring(outputArea.getText().indexOf("\n") + 1));
             }
         } else {

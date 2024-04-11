@@ -1,13 +1,23 @@
 package skyworld;
 
+import skyworld.util.AudioPlayer;
 import skyworld.util.MD5;
 
 import java.io.*;
 import java.util.Scanner;
 
+/**
+ * 纯文字版
+ */
 public class SkyApp {
     public static void main(String[] args) {
         System.out.println("欢迎来到光遇世界！肝硬化~");
+        AudioPlayer.startPlay("/Audios/start.mp3");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         SkyMap theMap = new SkyMap();
         theMap.mapEnum = MapEnum.home;
         theMap.mapID = 0;
@@ -42,7 +52,6 @@ public class SkyApp {
                     if (psw.equals(sc.nextLine())) {
                         System.out.println("成功创建账号！祝您游戏愉快！");
                         you = new YouSelf(name, MD5.encode(psw));
-                        you.save();
                         flag = false;
                         break;
                     }
@@ -50,10 +59,14 @@ public class SkyApp {
                 }
             }
         }
+        AudioPlayer.startBgm("/Audios/begin.mp3");
         theMap.addPlayer(you);
         theMap.you = you;
         you.nowMap = theMap;
         theMap.refreshMap();
+        you.lodeMapData();
+        you.lodeCandleData();
+        you.save();
         while (true) {
             you.choose();
         }

@@ -8,6 +8,7 @@ import java.net.URL;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 import org.tritonus.share.sampled.file.TAudioFileReader;
@@ -113,6 +114,7 @@ public class AudioPlayer {
                     bgmPlayer = new AdvancedPlayer(inputStream);
                     bgmPlayer.setPlayBackListener(new PlaybackListener(){});
                     bgmPlayer.play();
+                    bgmPlayer=null;
                 } catch (IOException e) {
                     System.err.println("Error opening file: " + e.getMessage());
                 } catch (JavaLayerException e) {
