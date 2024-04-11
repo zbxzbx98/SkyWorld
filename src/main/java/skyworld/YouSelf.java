@@ -67,6 +67,11 @@ public class YouSelf extends SkyPlayer {
      * 玩家选择
      */
     public void choose() {
+        try {
+            System.in.reset();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Scanner sc = new Scanner(System.in);
         System.out.println("------------------------");
         System.out.println("你现在在" + nowMap.mapInfo.get(nowMap.mapEnum.ordinal()).get(nowMap.mapID).get(0) + "！你可以：");
@@ -375,10 +380,10 @@ public class YouSelf extends SkyPlayer {
         beforeGetCandleCount += get;
         todayGetFilePointCount = surplus;
         todayGetCandleCount += get;
-        if (beforeGetCandleCount+addGetProgress < 1) {
+        if (beforeGetCandleCount + addGetProgress < 1) {
             System.out.println("你拥有的烛火点不足以合成下一个蜡烛!");
-        } else{
-            get = (int) (beforeGetCandleCount+addGetProgress);
+        } else {
+            get = (int) (beforeGetCandleCount + addGetProgress);
             beforeGetCandleCount = beforeGetCandleCount - get + addGetProgress;
             candle += get;
             System.out.println("你合成了" + get + "根蜡烛!");

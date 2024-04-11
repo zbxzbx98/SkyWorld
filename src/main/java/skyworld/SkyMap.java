@@ -24,7 +24,7 @@ public class SkyMap {
         ObjectMapper objectMapper = new ObjectMapper();
         URL jsonFile = SkyMap.class.getResource("/locations.json");
         JavaType intType = objectMapper.getTypeFactory().constructType(Integer.class);
-        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class,intType,
+        MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, intType,
                 objectMapper.getTypeFactory().constructMapType(Map.class, intType,
                         objectMapper.getTypeFactory().constructParametricType(ArrayList.class, String.class)));
         try {

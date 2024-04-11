@@ -19,6 +19,11 @@ public class SimulatedUserInputStream extends InputStream {
     }
 
     @Override
+    public synchronized void reset(){
+        buffer.setLength(0);
+    }
+
+    @Override
     public synchronized int read() throws IOException {
         while (buffer.isEmpty()) { // Wait until there is input available
             try {
@@ -69,7 +74,7 @@ public class SimulatedUserInputStream extends InputStream {
     }
 
     @Override
-    public int available(){
+    public synchronized int available(){
         return buffer.length();
     }
 }
