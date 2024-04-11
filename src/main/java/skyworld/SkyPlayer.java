@@ -80,7 +80,7 @@ public class SkyPlayer {
      * 获取光翼信息
      * @return 总光翼数
      */
-    public int lightWingInfo(){
+    public synchronized int lightWingInfo(){
         return now_permanent_light_wing + wings_of_light;
     }
 

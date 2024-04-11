@@ -13,7 +13,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class YouSelf extends SkyPlayer {
@@ -196,7 +195,7 @@ public class YouSelf extends SkyPlayer {
         Scanner sc = new Scanner(System.in);
         th1.start();
         th2.start();
-        while (wings_of_light > 0) {
+        while (lightWingInfo() > 0) {
             System.out.println("你现在还剩" + lightWingInfo() + "个光翼，" + String.format("%.2f", nowEnergy) + "点能量,你现在可以：");
             if (sa.stage == 1) {
                 System.out.println("冲入红石雨点石像（1s） ---> 输入1");
@@ -216,7 +215,7 @@ public class YouSelf extends SkyPlayer {
                         }
                         Thread.sleep(1000);
                         if (sa.nextStatue()) {
-                            userLightWing();
+                            useLightWing();
                             System.out.println("你点到了一个石像！现在还剩" + lightWingInfo() + "个光翼");
                             if (lightWingInfo() <= 0) {
                                 System.out.println("你没有光翼可以献祭了！");
@@ -250,8 +249,8 @@ public class YouSelf extends SkyPlayer {
         double get = (double) sa.get / 4;
         System.out.println("你献祭了！获得了" + get + "根红蜡烛！");
         redCandle += get;
-        wings_of_light = permanent_light_wing;
-        System.out.println("拿完永久光翼后，你现在只剩下" + wings_of_light + "个光翼了");
+        now_permanent_light_wing = permanent_light_wing;
+        System.out.println("拿完永久光翼后，你现在只剩下" + lightWingInfo() + "个光翼了");
         getMaxEnergy();
         start();
         nowMap.mapID = 4;
@@ -563,11 +562,22 @@ public class YouSelf extends SkyPlayer {
     }
 
     /**
+     * 使用光翼
+     */
+    public synchronized void useLightWing() {
+        if (wings_of_light > 0) {
+            wings_of_light--;
+            lostNomel(1);
+        } else if (permanent_light_wing > 0) {
+            now_permanent_light_wing--;
+        }
+    }
+
+    /**
      * 掉光翼
-     *
      * @return 掉光翼的数量
      */
-    public int lostLightWing() {
+    public synchronized int lostLightWing() {
         int lost = 0;
         int sum = lightWingInfo();
         if (wings_of_light > 0) {
@@ -623,17 +633,5 @@ public class YouSelf extends SkyPlayer {
         }
         if (i > 0)
             System.err.println("普通翼扣除异常");
-    }
-
-    /**
-     * 使用光翼
-     */
-    public void userLightWing() {
-        if (wings_of_light > 0) {
-            wings_of_light--;
-            lostNomel(1);
-        } else if (permanent_light_wing > 0) {
-            now_permanent_light_wing--;
-        }
     }
 }

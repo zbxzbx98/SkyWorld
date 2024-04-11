@@ -33,7 +33,7 @@ public class SkyWindowApp {
         } catch (Exception ignored) {
         }
         isRunning = true;
-        mainFrame = new JFrame("光遇极简版--by zbxzbx98");
+        mainFrame = new JFrame("光遇极速版--by zbxzbx98");
         mainFrame.setSize(900, 550);
         mainFrame.setResizable(false);
         mainFrame.setLocationRelativeTo(null);
@@ -52,21 +52,15 @@ public class SkyWindowApp {
             }
         });
         JMenuBar bar = new JMenuBar();
-        JMenu menu = new JMenu("设置");
-        JMenuItem menu1 = new JMenuItem("遇境");
-        JMenuItem menu2 = new JMenuItem("音频");
-        JMenuItem menu3 = new JMenuItem("精灵");
-        menu.add(menu1);
-        menu.add(menu2);
-        menu.add(menu3);
+        JMenu menu = new JMenu(" ");
         bar.add(menu);
         mainFrame.setJMenuBar(bar);
         AudioPlayer.startPlay("/Audios/start.mp3");
         theMap.mapEnum = MapEnum.home;
         theMap.mapID = 0;
         JLabel jLabel = new JLabel();
-        backgroundImage = new BackgroundImage(
-                new ImageIcon(SkyWindowApp.class.getResource("/Images/start.jpg")).getImage(), jLabel);
+        backgroundImage = new BackgroundImage(new ImageIcon(
+                SkyWindowApp.class.getResource("/Images/start.jpg")).getImage(), jLabel);
         backgroundImage.setBounds(0, 0, 900, 550);
         mainFrame.add(backgroundImage);
         mainFrame.setVisible(true);
@@ -75,31 +69,29 @@ public class SkyWindowApp {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        backgroundImage.setBackgroundImage(
-                new ImageIcon(SkyWindowApp.class.getResource("/Images/BackGround.png")).getImage(), 2000, 500);
+        backgroundImage.setBackgroundImage(new ImageIcon(
+                SkyWindowApp.class.getResource("/Images/BackGround.png")).getImage(), 2000, 500);
         JButton button = new JButton("登录游戏");
         button.setBounds(360, 300, 180, 70);
         button.setBackground(new Color(238, 238, 238));
         button.addActionListener(e -> {
             mainFrame.setEnabled(false);
-            Longin(jLabel);
+            Login(jLabel);
         });
         jLabel.add(button);
         mainFrame.add(jLabel);
-
     }
-
     /**
      * 登录
      *
      * @param oldLabel 旧界面
      */
-    public static void Longin(JLabel oldLabel) {
-        JFrame f = new JFrame("光遇极简版--登录");
+    public static void Login(JLabel oldLabel) {
+        JFrame f = new JFrame("光遇极速版--登录");
         f.setSize(300, 200);
         f.setResizable(false);
         f.setLocationRelativeTo(mainFrame);
-        f.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+        f.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         f.setIconImage(imageIcon.getImage());
         f.setLayout(null);
 
@@ -116,9 +108,9 @@ public class SkyWindowApp {
         f.add(j1);
         f.add(j2);
 
-        JButton LonginButton = new JButton("登录");
-        LonginButton.setBounds(35, 120, 80, 20);
-        LonginButton.addActionListener(e -> {
+        JButton LoginButton = new JButton("登录");
+        LoginButton.setBounds(35, 120, 80, 20);
+        LoginButton.addActionListener(e -> {
             if (username.getText().isEmpty() || password.getPassword().length == 0) {
                 JOptionPane.showMessageDialog(null, "用户名或密码不能为空！", "错误", JOptionPane.WARNING_MESSAGE);
                 return;
@@ -138,7 +130,7 @@ public class SkyWindowApp {
                     you.heart = Double.parseDouble(infos[5]);
                     you.redCandle = Double.parseDouble(infos[6]);
                     f.dispatchEvent(new WindowEvent(f, WindowEvent.WINDOW_CLOSING));
-                    mainFrame.setTitle("光遇极简版--by zbxzbx98--已登录：" + name);
+                    mainFrame.setTitle("光遇极速版--by zbxzbx98--已登录：" + name);
 //                    oldFrame.setEnabled(true);
                     ToGame(oldLabel);
                 } else {
@@ -163,13 +155,13 @@ public class SkyWindowApp {
                 you = new YouSelf(username.getText(), MD5.encode(new String(password.getPassword())));
 //                you.save();
                 f.dispatchEvent(new WindowEvent(f, WindowEvent.WINDOW_CLOSING));
-                mainFrame.setTitle("光遇极简版--by zbxzbx98--已登录：" + username.getText());
+                mainFrame.setTitle("光遇极速版--by zbxzbx98--已登录：" + username.getText());
                 ToGame(oldLabel);
             } else {
                 JOptionPane.showMessageDialog(null, "用户名或密码不能为空！", "错误", JOptionPane.WARNING_MESSAGE);
             }
         });
-        f.add(LonginButton);
+        f.add(LoginButton);
         f.add(registerButton);
         f.addWindowListener(new WindowAdapter() {
             @Override
@@ -180,6 +172,27 @@ public class SkyWindowApp {
         f.setVisible(true);
     }
 
+    private static void addBar(SimulatedUserInputStream inputStream) {
+        JMenuBar bar = mainFrame.getJMenuBar();
+        JMenu menu = bar.getMenu(0);
+        menu.setText("设置");
+        JMenuItem menu1 = new JMenuItem("遇境");
+        menu1.addActionListener(e -> {
+            inputStream.addInput("3\n");
+        });
+        JMenuItem menu2 = new JMenuItem("音频");
+        menu2.addActionListener(e -> {
+            System.out.println("暂不支持设置音频");
+        });
+        JMenuItem menu3 = new JMenuItem("精灵");
+        menu3.addActionListener(e -> {
+            System.out.println("暂不支持精灵功能");
+        });
+        menu.add(menu1);
+        menu.add(menu2);
+        menu.add(menu3);
+    }
+
     /**
      * 进入游戏
      *
@@ -188,8 +201,8 @@ public class SkyWindowApp {
     public static void ToGame(JLabel oldLabel) {
         AudioPlayer.startBgm("/Audios/begin.mp3");
         oldLabel.removeAll();
-        JTextArea newTextDisplay = new JTextArea("光遇极简版--by zbxzbx98\n");
-        newTextDisplay.setLineWrap(true);        //激活自动换行功能
+        JTextArea newTextDisplay = new JTextArea("光遇极速版--by zbxzbx98\n");
+        newTextDisplay.setLineWrap(true);//激活自动换行功能
         newTextDisplay.setWrapStyleWord(true);
         JScrollPane scrollpane = new JScrollPane(newTextDisplay);
         //取消显示水平滚动条
@@ -218,6 +231,7 @@ public class SkyWindowApp {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            addBar(simulatedUserInput);
             theMap.addPlayer(you);
             theMap.you = you;
             you.nowMap = theMap;

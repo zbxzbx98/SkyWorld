@@ -46,14 +46,26 @@ public class BackgroundImage extends JComponent {
         startFadeAnimation(0, 1, 2000);
     }
 
+    /**设置背景图片，默认渐变时间为500ms*2
+     * @param backgroundImage 新背景图
+     */
     public void setBackgroundImage(Image backgroundImage) {
         setBackgroundImage(backgroundImage,500,500);
     }
 
+    /**设置背景图片，渐变速度为给定时间
+     * @param backgroundImage 新背景图
+     * @param time 切换图片时间（入和出均为此值）
+     */
     public void setBackgroundImage(Image backgroundImage,long time) {
         setBackgroundImage(backgroundImage, time, time);
     }
 
+    /**设置背景图片，渐变速度为给定时间
+     * @param backgroundImage 新背景图
+     * @param inTime 旧图片隐去时间
+     * @param outTime 新图片出现时间
+     */
     public void setBackgroundImage(Image backgroundImage,long inTime,long outTime) {
         if (backgroundImage == this.backgroundImage || backgroundImage == this.nextBackgroundImage)
             return;
@@ -90,7 +102,6 @@ public class BackgroundImage extends JComponent {
         g2d.dispose();
     }
 
-    // 实现渐变动画逻辑的方法...
     private void updateOpacity() {
         long currentTime = System.currentTimeMillis();
         float progress = (currentTime - animationStartTimestamp) / (float) animationDurationMs;
