@@ -3,6 +3,7 @@ package skyworld.util;
 import javax.sound.sampled.*;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 
 import javazoom.jl.decoder.JavaLayerException;
@@ -110,7 +111,7 @@ public class AudioPlayer {
         URL url = AudioPlayer.class.getResource(name);
         if (url != null) {
             if (".mp3".equals(name.substring(name.lastIndexOf(".")))) {
-                try (FileInputStream inputStream = new FileInputStream(url.getPath())) {
+                try (InputStream inputStream = url.openStream()) {
                     bgmPlayer = new AdvancedPlayer(inputStream);
                     bgmPlayer.setPlayBackListener(new PlaybackListener(){});
                     bgmPlayer.play();
