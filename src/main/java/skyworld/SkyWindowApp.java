@@ -235,6 +235,7 @@ public class SkyWindowApp {
             theMap.addPlayer(you);
             theMap.you = you;
             you.nowMap = theMap;
+            you.input=simulatedUserInput;
             theMap.refreshMap();
             you.lodeMapData();
             you.lodeCandleData();

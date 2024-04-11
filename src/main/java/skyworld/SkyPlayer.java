@@ -1,5 +1,7 @@
 package skyworld;
 
+import skyworld.io.SimulatedUserInputStream;
+
 import java.util.Random;
 
 public class SkyPlayer {

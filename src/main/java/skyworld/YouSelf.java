@@ -3,6 +3,7 @@ package skyworld;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
+import skyworld.io.SimulatedUserInputStream;
 import skyworld.thread.Sacrifice;
 import skyworld.thread.YouEnergy;
 import skyworld.util.AudioPlayer;
@@ -19,6 +20,7 @@ public class YouSelf extends SkyPlayer {
     public ArrayList<SkyPlayer> lightUpPlayer = new ArrayList<>();
     public SkyMap nowMap;
     public boolean black;
+    public SimulatedUserInputStream input;
     private final String password;
 
     private MapEnum lastMap;
@@ -187,7 +189,7 @@ public class YouSelf extends SkyPlayer {
      */
     public void xianJi() {
         Sacrifice sa = new Sacrifice();
-        YouEnergy ye = new YouEnergy(sa, this);
+        YouEnergy ye = new YouEnergy(sa, this,input);
         Thread th1 = new Thread(sa, "Sacrifice");
         Thread th2 = new Thread(ye, "YouEnergy");
         System.out.println("你开始了献祭！");
@@ -215,6 +217,11 @@ public class YouSelf extends SkyPlayer {
                         }
                         Thread.sleep(1000);
                         if (sa.nextStatue()) {
+                            if (lightWingInfo() <= 0) {
+                                System.out.println("你没有光翼可以献祭了！");
+                                sa.get--;
+                                break;
+                            }
                             useLightWing();
                             System.out.println("你点到了一个石像！现在还剩" + lightWingInfo() + "个光翼");
                             if (lightWingInfo() <= 0) {
@@ -231,6 +238,9 @@ public class YouSelf extends SkyPlayer {
                         sa.inSafePlace = true;
                         System.out.println("你进入了掩体等待...");
                         Thread.sleep(1000);
+                    }
+                    case -1 -> {
+                        System.out.println("你没有光翼可以献祭了！");
                     }
                     default -> System.out.println("输入错误！什么都没发生！");
                 }

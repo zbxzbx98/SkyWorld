@@ -1,6 +1,7 @@
 package skyworld.thread;
 
 import skyworld.YouSelf;
+import skyworld.io.SimulatedUserInputStream;
 
 import java.util.Random;
 
@@ -8,11 +9,13 @@ public class YouEnergy implements Runnable {
     YouSelf you;
     Sacrifice sa;
     public int type;
+    public SimulatedUserInputStream input;
 
-    public YouEnergy(Sacrifice sa, YouSelf you) {
+    public YouEnergy(Sacrifice sa, YouSelf you,SimulatedUserInputStream input) {
         type = 1;
         this.sa = sa;
         this.you = you;
+        this.input = input;
     }
 
     @Override
@@ -66,6 +69,9 @@ public class YouEnergy implements Runnable {
                 you.black = true;
             } else {
                 System.out.println("你又被砸掉了" + you.lostLightWing() + "个光翼！现在还剩" + you.lightWingInfo() + "个");
+            }
+            if (you.lightWingInfo() == 0) {
+                input.addInput("-1\n");
             }
         }
     }
